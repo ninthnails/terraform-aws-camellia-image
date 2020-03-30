@@ -6,7 +6,8 @@ Terraform module which creates Amazon Machine Images (AMI) for Camellia using Ha
 
 ```hcl
 module "image" {
-  source = "github.com/ninthnails/camellia-terraform//image"
+  source = "github.com/ninthnails/camellia-image-terraform"
+  version = "v1.0.0"
   prefix = "camellia"
   packer_template = "aws-private.json"
   packer_instance_type = "t3a.micro"
@@ -23,4 +24,9 @@ For example:
 
 ```shell script
 aws --region us-east-2 codebuild start-build --project-name camellia-kafka-automation-packer --source-version xyz...
+```
+
+or even shorter:
+```shell script
+$(terraform output packer_build_command)
 ```
