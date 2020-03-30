@@ -32,6 +32,9 @@ variable "tags" {
 provider "archive" {
 }
 
+provider "null" {
+}
+
 #################
 # Data and local variables
 #################
@@ -284,10 +287,32 @@ resource "aws_security_group" "codebuild-egress" {
   tags = merge(var.tags, map("Name", "${var.prefix}-kafka-codebuild"))
 }
 
+data "archive_file" "sources" {
+  type = "zip"
+  output_path = "${path.module}/sources.zip"
+  source_dir = "${path.module}/packer"
+}
+
+resource "aws_s3_bucket_object" "sources" {
+  acl = "private"
+  key = "codebuild/${var.prefix}-kafka-packer-sources.zip"
+  bucket = aws_s3_bucket.source.bucket
+  source = data.archive_file.sources.output_path
+  storage_class = "STANDARD_IA"
+  etag = data.archive_file.sources.output_md5
+}
+
+// Introduce wait time to work around race condition between CodeBuild project and IAM service role.
+// CodeBuild complains it can't assume the role, even though it exists and has the proper assume policy.
+resource "null_resource" "delay" {
+  provisioner "local-exec" {
+    command = "echo 'Waiting on ${aws_iam_role.service.arn} to be available'; sleep 2"
+  }
+}
+
 resource "aws_codebuild_project" "packer" {
   depends_on = [
-    aws_iam_role.service,
-    aws_iam_role_policy.codebuild
+    null_resource.delay
   ]
   name = "${var.prefix}-kafka-automation-packer"
   description = "Runs Packer to build AMI"
@@ -350,7 +375,7 @@ phases:
         ${var.packer_template}
 EOF
     type = "S3"
-    location = "${local.bucket_name}/codebuild/${var.prefix}-kafka-packer-sources.zip"
+    location = "${aws_s3_bucket_object.sources.bucket}/${aws_s3_bucket_object.sources.key}"
   }
 
   tags = var.tags
@@ -360,21 +385,6 @@ EOF
     subnets = var.subnet_ids
     vpc_id = var.vpc_id
   }
-}
-
-data "archive_file" "sources" {
-  type = "zip"
-  output_path = "${path.module}/sources.zip"
-  source_dir = "${path.module}/packer"
-}
-
-resource "aws_s3_bucket_object" "sources" {
-  acl = "private"
-  key = "codebuild/${var.prefix}-kafka-packer-sources.zip"
-  bucket = local.bucket_name
-  source = data.archive_file.sources.output_path
-  storage_class = "STANDARD_IA"
-  etag = data.archive_file.sources.output_md5
 }
 
 #################
