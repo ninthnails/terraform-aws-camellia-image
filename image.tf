@@ -72,23 +72,25 @@ resource "aws_s3_bucket" "source" {
   }
 }
 
+data "aws_iam_policy_document" "service-assume" {
+  statement {
+    actions = [
+      "sts:AssumeRole"
+    ]
+    effect = "Allow"
+    principals {
+      identifiers = [
+        "codebuild.amazonaws.com"
+      ]
+      type = "Service"
+    }
+  }
+}
+
 resource "aws_iam_role" "service" {
   name = "${var.prefix}-kafka-codebuild"
   tags = var.tags
-  assume_role_policy = <<EOF
-{
- "Version": "2012-10-17",
- "Statement": [
-   {
-     "Action": "sts:AssumeRole",
-     "Principal": {
-       "Service": "codebuild.amazonaws.com"
-     },
-     "Effect": "Allow"
-   }
- ]
-}
-  EOF
+  assume_role_policy = data.aws_iam_policy_document.service-assume.json
 }
 
 resource "aws_iam_role_policy" "codebuild" {
@@ -302,20 +304,21 @@ resource "aws_s3_bucket_object" "sources" {
   etag = data.archive_file.sources.output_md5
 }
 
-// Introduce wait time to work around race condition between CodeBuild project and IAM service role.
+// Introduce wait time to work around race condition between CodeBuild project and IAM service role creations.
 // CodeBuild complains it can't assume the role, even though it exists and has the proper assume policy.
 resource "null_resource" "delay" {
+  depends_on = [
+    aws_iam_role.service
+  ]
   provisioner "local-exec" {
-    command = "echo 'Waiting on ${aws_iam_role.service.arn} to be available'; sleep 2"
+    command = "/bin/sleep 10"
   }
 }
 
 resource "aws_codebuild_project" "packer" {
-  depends_on = [
-    null_resource.delay
-  ]
   name = "${var.prefix}-kafka-automation-packer"
-  description = "Runs Packer to build AMI"
+  // The resource id isn't important, it's there to force dependency on the resource.
+  description = "Runs Packer to build AMI${substr(null_resource.delay.id, 0, 0)}"
   service_role = aws_iam_role.service.arn
 
   logs_config {
