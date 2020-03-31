@@ -1,41 +1,4 @@
 #################
-# Variables
-#################
-variable "prefix" {
-  default = "camellia"
-}
-
-variable "vpc_id" {
-}
-
-variable "subnet_ids" {
-  type = list(string)
-}
-
-variable "packer_template" {
-  default = "aws-default.json"
-}
-
-variable "packer_instance_type" {
-  default = "t3.micro"
-  description = "Type of EC2 instance use for Packer. Must be an EBS optimized type."
-}
-
-variable "tags" {
-  type = map(string)
-  default = {}
-}
-
-#################
-# Providers
-#################
-provider "archive" {
-}
-
-provider "null" {
-}
-
-#################
 # Data and local variables
 #################
 data "aws_region" "current" {}
@@ -388,15 +351,4 @@ EOF
     subnets = var.subnet_ids
     vpc_id = var.vpc_id
   }
-}
-
-#################
-# Outputs
-#################
-output "bucket_name" {
-  value = local.bucket_name
-}
-
-output "build_command" {
-  value = "aws --region ${data.aws_region.current.name} codebuild start-build --project-name ${aws_codebuild_project.packer.name}${length(replace(trimspace(aws_s3_bucket_object.sources.version_id), "null", "")) > 0 ? format(" --source-version '%s'", aws_s3_bucket_object.sources.version_id) : ""}"
 }
