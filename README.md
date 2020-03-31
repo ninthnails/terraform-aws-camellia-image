@@ -18,9 +18,9 @@ Terraform module which creates Amazon Machine Images (AMI) for Camellia using Ha
 ## Usage
 
 ```hcl
-module "image" {
-  source = "github.com/ninthnails/terraform-aws-camellia-image"
-  version = "v1.0.2"
+module "camellia-image" {
+  source = "ninthnails/camellia-image/aws"
+  version = "1.0.2"
   prefix = "camellia"
   packer_template = "aws-private.json"
   packer_instance_type = "t3a.micro"
