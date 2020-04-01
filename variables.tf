@@ -1,6 +1,6 @@
 variable "prefix" {
   default = "camellia"
-  description = "Resources will be prevfixed with this."
+  description = "Resources will be prefixed with this."
 }
 
 variable "vpc_id" {
