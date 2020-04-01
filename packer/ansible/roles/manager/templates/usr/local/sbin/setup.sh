@@ -3,7 +3,7 @@
 /usr/bin/sed -i -r "s/^127.0.0.1(.*)$/127.0.0.1\1 $(/usr/bin/hostname)/" /etc/hosts
 
 get_ssm_parameter() {
-  /usr/bin/aws ssm --region "${AWS_REGION}" get-parameter --name "${1}" --query Parameter.Value --output text
+    /usr/bin/aws ssm --region "${AWS_REGION}" get-parameter --name "${1}" --with-decryption --query Parameter.Value --output text
 }
 
 get_sm_secret() {
