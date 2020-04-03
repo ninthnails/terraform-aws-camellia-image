@@ -20,8 +20,6 @@
   yum:
     name: '*'
     state: latest
-  async: 120
-  poll: 0
 
 - name: Install packages
   package:

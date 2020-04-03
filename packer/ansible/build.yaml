@@ -6,10 +6,10 @@
 #  vars_files:
 #    - roles/kafka/defaults/main.yaml
   roles:
-    - system
-    - zookeeper
-    - kafka
-    - manager
-    - monitoring
-    - verify
-    - finalize
+    - { role: system, tags: system }
+    - { role: zookeeper, tags: zookeeper }
+    - { role: kafka, tags: kafka }
+    - { role: manager, tags: manager }
+    - { role: monitoring, tags: monitoring }
+    - { role: verify, tags: verify }
+    - { role: finalize, tags: finalize }

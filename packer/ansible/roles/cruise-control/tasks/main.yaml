@@ -14,9 +14,24 @@
     - "{{ cruise_control_install_path }}"
     - "{{ cruise_control_logging_path }}"
 
+- name: Create temporary directory
+  tempfile:
+    state: directory
+  register: cc_temp_dir
+
 - name: Download archive
+  get_url:
+    url: "{{ cruise_control_dist_url }}/{{ cruise_control_version }}/linkedin-cruise-control-{{ cruise_control_version }}.tgz"
+    dest: "{{ cc_temp_dir.path }}/linkedin-cruise-control.tgz"
+    timeout: 30
+  register: cc_dist_download
+  retries: 3
+  delay: 5
+  until: not cc_dist_download.failed
+
+- name: Unpack archive
   unarchive:
-    src: "{{ cruise_control_dist_url }}/{{ cruise_control_version }}/linkedin-cruise-control-{{ cruise_control_version }}.tgz"
+    src: "{{ cc_temp_dir.path }}/linkedin-cruise-control.tgz"
     dest: "{{ cruise_control_install_path }}/"
     remote_src: yes
     extra_opts:
