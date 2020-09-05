@@ -309,7 +309,7 @@ phases:
     runtime-versions:
        java: corretto8
     commands:
-      - curl -sL -o packer.zip https://releases.hashicorp.com/packer/1.4.5/packer_1.4.5_linux_amd64.zip && unzip packer.zip
+      - curl -sL -o packer.zip https://releases.hashicorp.com/packer/1.6.2/packer_1.6.2_linux_amd64.zip && unzip packer.zip
       - pip3 -q install 'ansible~=2.7,<2.8'
   pre_build:
     commands:
