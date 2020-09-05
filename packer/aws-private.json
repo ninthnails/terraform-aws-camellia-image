@@ -2,7 +2,7 @@
   "description": "Camellia Kafka",
   "variables": {
     "region": "us-east-1",
-    "kafka_version": "2.3.1",
+    "kafka_version": "2.4.1",
     "source_version": "LATEST",
     "build_id": "UNKNOWN",
     "build_number": "UNKNOWN",
@@ -23,8 +23,8 @@
           "virtualization-type": "hvm",
           "architecture": "x86_64",
           "ena-support": "true",
-          "name": "amzn2-ami-hvm-2.0.2019*",
-          "description": "Amazon Linux 2 AMI 2.0.2019* x86_64 HVM gp2",
+          "name": "amzn2-ami-hvm-2.0.2020*",
+          "description": "Amazon Linux 2 AMI 2.0.2020* x86_64 HVM gp2",
           "root-device-type": "ebs",
           "block-device-mapping.volume-type": "gp2"
         },
