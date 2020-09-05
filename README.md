@@ -3,7 +3,7 @@
 Terraform module which creates Amazon Machine Images (AMI) for Camellia using HashiCorp Packer and AWS CodeBuild.
 
 ## Available Features
-* Apache Kafka version 2.3.1
+* Apache Kafka version 2.4.1
 * Based on Amazon Linux 2 with performance tuning 
 * Multi Availability Zone support
 * Support EBS, Instance Storage and root volume as storage types  
@@ -20,7 +20,7 @@ Terraform module which creates Amazon Machine Images (AMI) for Camellia using Ha
 ```hcl
 module "camellia-image" {
   source = "ninthnails/camellia-image/aws"
-  version = "1.1.0"
+  version = "1.2.0"
   prefix = "camellia"
   packer_template = "aws-private.json"
   packer_instance_type = "t3a.micro"
