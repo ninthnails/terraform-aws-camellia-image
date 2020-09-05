@@ -2,7 +2,7 @@
   "description": "Camellia Kafka",
   "variables": {
     "region": "us-east-1",
-    "kafka_version": "2.4.1",
+    "kafka_version": "2.5.1",
     "source_version": "LATEST",
     "build_id": "UNKNOWN",
     "build_number": "UNKNOWN",
