@@ -11,7 +11,8 @@
     "instance_type": "t3.micro",
     "vpc_id": "",
     "vpc_cidr": "10.0.0.0/16",
-    "subnet_id": ""
+    "subnet_id": "",
+    "associate_public_ip_address": "false"
   },
   "builders": [
     {
@@ -37,6 +38,7 @@
       "vpc_id": "{{ user `vpc_id` }}",
       "subnet_id": "{{ user `subnet_id` }}",
       "temporary_security_group_source_cidrs": [ "{{ user `vpc_cidr` }}" ],
+      "associate_public_ip_address": "{{ user `associate_public_ip_address` }}",
       "region": "{{ user `region` }}",
       "ena_support": true,
       "ebs_optimized": true,

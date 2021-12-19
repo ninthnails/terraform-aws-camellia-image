@@ -43,7 +43,7 @@
 
 - name: Download archive
   unarchive:
-    src: "{{ item }}/{{ kafka_version }}/kafka_2.12-{{ kafka_version }}.tgz"
+    src: "{{ kafka_dist_url }}/{{ kafka_version }}/kafka_2.12-{{ kafka_version }}.tgz"
     remote_src: yes
     dest: "{{ kafka_install_path }}"
     extra_opts:
@@ -51,7 +51,6 @@
     owner: "{{ kafka_user }}"
     group: "{{ kafka_user }}"
     creates: "{{ kafka_install_path }}/bin"
-  loop: "{{ kafka_dist_urls }}"
 
 - name: Add binaries to PATH
   copy:

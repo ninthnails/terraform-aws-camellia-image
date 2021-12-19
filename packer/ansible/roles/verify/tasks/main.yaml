@@ -130,19 +130,19 @@
 
 - name: Is Zookeeper service disabled?
   assert:
-    that: "'zookeeper.service' not in ansible_facts.services"
+    that: "'zookeeper.service' not in ansible_facts.services or ansible_facts.services['zookeeper.service'].status == 'disabled'"
 
 - name: Is Kafka service disabled?
   assert:
-    that: "'kafka.service' not in ansible_facts.services"
+    that: "'kafka.service' not in ansible_facts.services or ansible_facts.services['kafka.service'].status == 'disabled'"
 
 - name: Is Cruise Control service disabled?
   assert:
-    that: "'cruisecontrol.service' not in ansible_facts.services"
+    that: "'cruisecontrol.service' not in ansible_facts.services or ansible_facts.services['cruisecontrol.service'].status == 'disabled'"
 
 - name: Is Cluster Manager for Apache Kafka service disabled?
   assert:
-    that: "'cmak.service' not in ansible_facts.services"
+    that: "'cmak.service' not in ansible_facts.services or ansible_facts.services['cmak.service'].status == 'disabled'"
 
 - name: Is amazon-ssm-agent running?
   assert:
