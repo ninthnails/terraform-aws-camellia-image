@@ -21,15 +21,12 @@ variable "private_subnet_ids" {
 #################
 provider "aws" {
   region = var.aws_region
-  version = "~> 2.45"
 }
 
 provider "archive" {
-  version = "~> 1.3"
 }
 
 provider "random" {
-  version = "~> 2.2"
 }
 
 #################

@@ -21,7 +21,6 @@ resource "random_id" "s3" {
 resource "aws_s3_bucket" "source" {
   acl = "private"
   bucket = local.bucket_name
-  region = data.aws_region.current.name
   server_side_encryption_configuration {
     rule {
       apply_server_side_encryption_by_default {

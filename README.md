@@ -35,11 +35,21 @@ module "camellia-image" {
 CodeBuild run is not automatically triggered. You need to execute the build command the command output.
 For example:
 
-```shell script
+```shell
 aws --region us-east-2 codebuild start-build --project-name camellia-kafka-automation-packer --source-version xyz...
 ```
 
 or even shorter:
-```shell script
+```shell
 $(terraform output packer_build_command)
 ```
+
+## Requirements
+
+| Name | Version |
+|------|---------|
+| terraform | >= 0.13 |
+| archive | >= 2.2 |
+| aws | >= 2.70 |
+| null | >= 3.1 |
+| random | >= 2.1 |
