@@ -1,4 +1,4 @@
-cruise_control_version: 2.5.12
+cruise_control_version: 2.5.42
 cruise_control_build_path: /tmp
 cruise_control_dist_url: "https://github.com/ninthnails/linkedin-cruise-control-dist/releases/download"
 cruise_control_install_path: /opt/cruise-control
