@@ -295,7 +295,7 @@ resource "aws_codebuild_project" "packer" {
 
   environment {
     compute_type = "BUILD_GENERAL1_SMALL"
-    image = "aws/codebuild/amazonlinux2-x86_64-standard:1.0"
+    image = "aws/codebuild/amazonlinux2-x86_64-standard:3.0"
     type = "LINUX_CONTAINER"
   }
 
@@ -306,10 +306,10 @@ version: 0.2
 phases:
   install:
     runtime-versions:
-       java: corretto8
+       java: corretto11
     commands:
-      - curl -sL -o packer.zip https://releases.hashicorp.com/packer/1.6.2/packer_1.6.2_linux_amd64.zip && unzip packer.zip
-      - pip3 -q install 'ansible~=2.7,<2.8'
+      - curl -sL -o packer.zip https://releases.hashicorp.com/packer/1.7.8/packer_1.7.8_linux_amd64.zip && unzip packer.zip
+      - pip3 -q install 'ansible~=2.9'
   pre_build:
     commands:
       - ./packer validate
