@@ -1,0 +1,15 @@
+version: '3.8'
+services:
+  ec2:
+    image: 'camelia-packer-ec2:latest'
+    # For Apple M1 user, see README.md.
+    build:
+      context: .
+    hostname: camelia
+    ports:
+      - '2222:22'
+    # Needed to run systemd inside the container
+    privileged: true
+    volumes:
+      # Provision the public key used for Ansible to connect to the container
+      - './ssh/client/id_rsa.pub:/home/ec2-user/.ssh/authorized_keys:ro'

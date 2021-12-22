@@ -78,10 +78,25 @@
         state: started
 
     - name: Is Zookeeper running?
-      wait_for:
-        delay: 3
-        port: 2181
-        timeout: 10
+      block:
+        - name: Wait for Zookeeper listener
+          wait_for:
+            delay: 3
+            port: 2181
+            timeout: 20
+      rescue:
+        - name: Get Zookeeper main log
+          slurp:
+            src: "{{ zookeeper_logging_path }}/server.log"
+          register: zookeeper_main_log
+
+        - name: Print Zookeeper main log
+          debug:
+            msg: "{{ zookeeper_main_log.content | b64decode }}"
+
+        - name: Failing verification
+          fail:
+            msg: Zookeeper failed to start in time
 
     - name: Enable Kafka service
       service:
@@ -90,10 +105,25 @@
         state: started
 
     - name: Is Kafka running?
-      wait_for:
-        delay: 5
-        port: 9092
-        timeout: 10
+      block:
+        - name: Wait for Kafka listener
+          wait_for:
+            delay: 5
+            port: 9092
+            timeout: 30
+      rescue:
+        - name: Get Kafka server log
+          slurp:
+            src: "{{ kafka_logging_path }}/server.log"
+          register: kafka_server_log
+
+        - name: Print Kafka server log
+          debug:
+            msg: "{{ kafka_server_log.content | b64decode }}"
+
+        - name: Failing verification
+          fail:
+            msg: 'Kafka failed to start in time'
 
   always:
     - name: Stop and disable back Kafka service
@@ -143,10 +173,6 @@
 - name: Is Cluster Manager for Apache Kafka service disabled?
   assert:
     that: "'cmak.service' not in ansible_facts.services or ansible_facts.services['cmak.service'].status == 'disabled'"
-
-- name: Is amazon-ssm-agent running?
-  assert:
-    that: ansible_facts.services['amazon-ssm-agent.service'].state == 'running'
 
 - name: Is collectd running?
   assert:

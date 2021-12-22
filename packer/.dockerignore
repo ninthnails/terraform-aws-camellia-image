@@ -1,0 +1,6 @@
+ansible
+docker-compose.yml
+ssh
+*.json
+*.md
+*.sh

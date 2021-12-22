@@ -99,3 +99,12 @@
     path: /usr/lib/jvm/jre/conf/security/java.security
     regexp: '#networkaddress\.cache\.ttl=-1'
     replace: "networkaddress.cache.ttl={{ java_networkaddress_cache_ttl }}"
+
+- name: Install Amazon SSM Agent package
+  package:
+    name: amazon-ssm-agent
+
+- name: Enable Amazon SSM Agent service
+  service:
+    name: amazon-ssm-agent
+    enabled: yes
