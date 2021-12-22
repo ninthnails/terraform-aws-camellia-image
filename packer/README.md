@@ -1,7 +1,7 @@
 ## Running Ansible Playbook on Docker Container
 
 The Docker image is only a more convenient and faster way for developing Ansible playbook.
-It is no way meant to be use for running in production environment.
+It is in no way meant to be used for running in production environment.
 The goal is to emulate an EC2 instance using Amazon Linux 2 AMI.
 
 ### Preparation
@@ -29,9 +29,9 @@ docker build -t camelia-packer-ec2:latest --platform 'linux/amd64' .
 ```shell
 docker compose up -d
 
-# Alternatively, use docker run
+# Alternatively, using docker run
 docker run --rm -dit -h camelia -p 2222:22 --privileged --memory-swap 0 --name packer-ec2 \
-  -v ./ssh/client/id_rsa.pub:/home/ec2-user/.ssh/authorized_keys:ro \
+  --platform 'linux/amd64' -v "${PWD}/ssh/client/id_rsa.pub:/home/ec2-user/.ssh/authorized_keys:ro" \
   camelia-packer-ec2:latest
 ```
 
