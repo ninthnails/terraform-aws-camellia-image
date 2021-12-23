@@ -110,7 +110,7 @@
           wait_for:
             delay: 5
             port: 9092
-            timeout: 30
+            timeout: 60
       rescue:
         - name: Get Kafka server log
           slurp:
