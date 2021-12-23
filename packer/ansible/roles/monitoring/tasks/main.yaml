@@ -12,7 +12,7 @@
     path: /etc/yum.repos.d/epel.repo
     section: epel
     option: enabled
-    value: 0
+    value: '0'
 
 - name: Install collectd packages
   yum:
@@ -21,6 +21,10 @@
       - collectd-zookeeper
     enablerepo: epel
     state: latest
+  register: monitoring_collectd_install_result
+  retries: 3
+  delay: 10
+  until: monitoring_collectd_install_result is succeeded
 
 - name: Configure collectd
   template:
