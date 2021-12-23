@@ -21,7 +21,7 @@ variable "packer_template" {
 }
 
 variable "packer_instance_type" {
-  default     = "t3.micro"
+  default     = "t3a.small"
   description = "Type of EC2 instance use for Packer. Must be an EBS optimized type and support ENA."
 }
 
