@@ -3,12 +3,22 @@
 #################
 data "aws_region" "current" {}
 
+data "aws_caller_identity" "current" {}
+
 data "aws_vpc" "this" {
-  id = var.vpc_id
+  id = local.is_vpc_provided ? var.vpc_id : null
+  default = local.is_vpc_provided ? false : true
+}
+
+data "aws_ip_ranges" "codebuild" {
+  regions  = [data.aws_region.current.name]
+  services = ["codebuild"]
 }
 
 locals {
-  bucket_name = substr("${var.prefix}-image-${data.aws_region.current.name}-${random_id.s3.hex}", 0, 63)
+  bucket_name     = substr("${var.prefix}-image-${data.aws_region.current.name}-${random_id.s3.hex}", 0, 63)
+  is_vpc_provided = var.vpc_id != "" && length(var.subnet_ids) > 0
+  sg_source_cidrs = local.is_vpc_provided ? [data.aws_vpc.this.cidr_block] : data.aws_ip_ranges.codebuild.cidr_blocks
 }
 
 #################
@@ -238,6 +248,7 @@ resource "aws_cloudwatch_log_group" "packer" {
 }
 
 resource "aws_security_group" "codebuild-egress" {
+  count = local.is_vpc_provided ? 1 : 0
   name_prefix = "${var.prefix}-kafka-codebuild-"
   description = "Group that CodeBuild uses to allow access to resources in the VPC and the Internet."
   vpc_id = var.vpc_id
@@ -314,9 +325,9 @@ phases:
     commands:
       - ./packer validate
         -var region=${data.aws_region.current.name}
-        -var vpc_id=${data.aws_vpc.this.id}
-        -var vpc_cidr=${data.aws_vpc.this.cidr_block}
-        -var subnet_id=${var.subnet_ids[0]}
+        -var vpc_id='${local.is_vpc_provided ? data.aws_vpc.this.id : ""}'
+        -var security_group_source_cidrs=${join(",", local.sg_source_cidrs)}
+        -var subnet_id='${local.is_vpc_provided ? var.subnet_ids[0] : ""}'
         -var ami_base_name=${var.prefix}
         -var iam_instance_profile=${aws_iam_instance_profile.packer.name}
         -var instance_type=${var.packer_instance_type}
@@ -328,9 +339,9 @@ phases:
     commands:
       - ./packer build -color=false
         -var region=${data.aws_region.current.name}
-        -var vpc_id=${data.aws_vpc.this.id}
-        -var vpc_cidr=${data.aws_vpc.this.cidr_block}
-        -var subnet_id=${var.subnet_ids[0]}
+        -var vpc_id='${local.is_vpc_provided ? data.aws_vpc.this.id : ""}'
+        -var security_group_source_cidrs=${join(",", local.sg_source_cidrs)}
+        -var subnet_id='${local.is_vpc_provided ? var.subnet_ids[0] : ""}'
         -var ami_base_name=${var.prefix}
         -var iam_instance_profile=${aws_iam_instance_profile.packer.name}
         -var instance_type=${var.packer_instance_type}
@@ -345,9 +356,12 @@ EOF
 
   tags = var.tags
 
-  vpc_config {
-    security_group_ids = [aws_security_group.codebuild-egress.id]
-    subnets = var.subnet_ids
-    vpc_id = var.vpc_id
+  dynamic "vpc_config" {
+    for_each = local.is_vpc_provided ? map(var.vpc_id, var.subnet_ids) : {}
+    content {
+      security_group_ids = [aws_security_group.codebuild-egress[0].id]
+      subnets = vpc_config.value
+      vpc_id = vpc_config.key
+    }
   }
 }

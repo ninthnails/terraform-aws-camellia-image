@@ -9,7 +9,7 @@
     "ami_base_name": "camellia",
     "iam_instance_profile": "camellia-packer-instance-role",
     "instance_type": "t3a.micro",
-    "security_group_source_cidr": "172.0.0.0/8",
+    "security_group_source_cidrs": "172.0.0.0/8,3.98.171.224/29,35.182.14.48/29",
     "associate_public_ip_address": "false"
   },
   "builders": [
@@ -55,7 +55,7 @@
         "most_free": true,
         "random": false
       },
-      "temporary_security_group_source_cidrs": [ "{{ user `security_group_source_cidr` }}" ],
+      "temporary_security_group_source_cidrs": "{{ user `security_group_source_cidrs` }}",
       "associate_public_ip_address": "{{ user `associate_public_ip_address` }}",
       "region": "{{ user `region` }}",
       "ena_support": true,

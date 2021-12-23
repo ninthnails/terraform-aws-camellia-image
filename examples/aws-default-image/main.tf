@@ -31,17 +31,6 @@ variable "prefix" {
   default = "camellia-example"
 }
 
-variable "packer_template" {
-  default = "aws-private.json"
-}
-
-variable "vpc_id" {
-}
-
-variable "private_subnet_ids" {
-  type = list(string)
-}
-
 #################
 # Providers
 #################
@@ -60,10 +49,8 @@ provider "random" {
 #################
 module "image" {
   source = "../../"
-  packer_template = var.packer_template
+  packer_template = "aws-default.json"
   prefix = var.prefix
-  subnet_ids = var.private_subnet_ids
-  vpc_id = var.vpc_id
 }
 
 #################
