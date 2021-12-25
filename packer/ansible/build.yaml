@@ -11,6 +11,8 @@
 #  vars_files:
 #    - roles/kafka/defaults/main.yaml
 #    - roles/zookeeper/defaults/main.yaml
+#    - roles/cluster-manager/defaults/main.yaml
+#    - roles/cruise-control/defaults/main.yaml
   roles:
     - { role: system, tags: system }
     - { role: zookeeper, tags: zookeeper }

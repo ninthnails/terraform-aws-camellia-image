@@ -8,6 +8,7 @@ services:
     hostname: camelia
     ports:
       - '2222:22'
+      - '9090-9092:9090-9092'
     # Needed to run systemd inside the container
     privileged: true
     volumes:

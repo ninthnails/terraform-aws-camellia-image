@@ -50,11 +50,14 @@
   assert:
     that: zookeeper_install_check.stat.isdir is defined and zookeeper_install_check.stat.isdir
 
-- name: Backup Kafka configuration
+- name: Backup configuration files
   copy:
-    src: "{{ kafka_install_path }}/config/server.properties"
-    dest: "{{ kafka_install_path }}/config/server.properties.back"
+    src: "{{ item }}"
+    dest: "{{ item }}.back"
     remote_src: yes
+  loop:
+    - "{{ kafka_install_path }}/config/server.properties"
+    - "{{ cruise_control_install_path }}/config/cruisecontrol.properties"
 
 - name: Configure Kafka for verification
   replace:
@@ -69,7 +72,15 @@
     - ['transaction\.state\.log\.replication\.factor=\d', "transaction.state.log.replication.factor=1"]
     - ['transaction\.state\.log\.min\.isr=\d', "transaction.state.log.min.isr=1"]
 
-- name: Smoke test Zookeeper and Kafka services
+- name: Configure Cruise Control for verification
+  replace:
+    path: "{{ cruise_control_install_path }}/config/cruisecontrol.properties"
+    regexp: "{{ item[0] }}"
+    replace: "{{ item[1] }}"
+  loop:
+    - ['sample\.store\.topic\.replication\.factor=.*', "sample.store.topic.replication.factor=1"]
+
+- name: Smoke test services
   block:
     - name: Enable Zookeeper service
       service:
@@ -81,9 +92,9 @@
       block:
         - name: Wait for Zookeeper listener
           wait_for:
-            delay: 3
+            delay: 5
             port: 2181
-            timeout: 20
+            timeout: 30
       rescue:
         - name: Get Zookeeper main log
           slurp:
@@ -110,7 +121,7 @@
           wait_for:
             delay: 5
             port: 9092
-            timeout: 60
+            timeout: 120
       rescue:
         - name: Get Kafka server log
           slurp:
@@ -123,37 +134,69 @@
 
         - name: Failing verification
           fail:
-            msg: 'Kafka failed to start in time'
+            msg: Kafka failed to start in time
+
+    - name: Enable Cruise Control service
+      service:
+        name: cruisecontrol
+        enabled: yes
+        state: started
+
+    - name: Is Cruise Control running?
+      block:
+        - name: Wait for Cruise Control listener
+          wait_for:
+            delay: 5
+            port: 9090
+            timeout: 120
+      rescue:
+        - name: Get Cruise Control log
+          slurp:
+            src: "{{ cruise_control_logging_path }}/kafkacruisecontrol.log"
+          register: cruise_control_server_log
+
+        - name: Print Cruise Control server log
+          debug:
+            msg: "{{ cruise_control_server_log.content | b64decode }}"
+
+        - name: Failing verification
+          fail:
+            msg: 'Cruise Control failed to start in time'
 
   always:
-    - name: Stop and disable back Kafka service
+    - name: Stop and disable services
       service:
-        name: kafka
+        name: "{{ item }}"
         enabled: no
         state: stopped
+      loop:
+        - cruisecontrol
+        - kafka
+        - zookeeper
 
-    - name: Reset Kafka service state
-      command: systemctl reset-failed kafka
+    - name: Reset services state
+      command: "systemctl reset-failed {{ item }}"
+      loop:
+        - cruisecontrol
+        - kafka
+        - zookeeper
 
-    - name: Stop and disable back Zookeeper service
-      service:
-        name: zookeeper
-        enabled: no
-        state: stopped
-
-    - name: Reset Zookeeper service state
-      command: systemctl reset-failed zookeeper
-
-    - name: Revert Kafka configuration
+    - name: Revert configuration files
       copy:
-        src: "{{ kafka_install_path }}/config/server.properties.back"
-        dest: "{{ kafka_install_path }}/config/server.properties"
+        src: "{{ item }}.back"
+        dest: "{{ item }}"
         remote_src: yes
+      loop:
+        - "{{ kafka_install_path }}/config/server.properties"
+        - "{{ cruise_control_install_path }}/config/cruisecontrol.properties"
 
-    - name: Remove backup Kafka configuration
+    - name: Remove configuration backup files
       file:
-        path: "{{ kafka_install_path }}/config/server.properties.back"
+        path: "{{ item }}"
         state: absent
+      loop:
+        - "{{ kafka_install_path }}/config/server.properties.back"
+        - "{{ cruise_control_install_path }}/config/cruisecontrol.properties"
 
 - name: Get service status
   service_facts:

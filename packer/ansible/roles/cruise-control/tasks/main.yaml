@@ -48,9 +48,46 @@
     group: "{{ cruise_control_user }}"
     mode: 0644
   loop:
-    - log4j.properties
-    - cruisecontrol.properties
     - realm.properties
+
+- name: Customize program server configuration
+  replace:
+    path: "{{ cruise_control_install_path }}/config/cruisecontrol.properties"
+    regexp: "{{ item[0] }}"
+    replace: "{{ item[1] }}"
+  loop:
+    - ['capacity\.config\.file=config/capacityJBOD\.json', "#capacity.config.file=config/capacityJBOD.json"]
+    - ['#capacity\.config\.file=config/capacity\.json', "capacity.config.file=config/capacity.json"]
+    - ['webserver\.accesslog\.path=access\.log', "webserver.accesslog.path={{ cruise_control_logging_path }}/access.log"]
+
+- name: Add HTTPS settings to configuration
+  blockinfile:
+    path: "{{ cruise_control_install_path }}/config/cruisecontrol.properties"
+    block: |
+      # Configurations for SSL/TLS
+      # ==========================
+      ssl.enabled.protocols=TLSv1.2
+      
+      # HTTPS settings
+      webserver.ssl.enable=false
+      webserver.ssl.keystore.location={{ cruise_control_install_path }}/config/default.p12
+      webserver.ssl.keystore.password=changeit
+      webserver.ssl.keystore.type=PKCS12
+      webserver.ssl.protocol=TLS
+      
+      # Configurations for security and authentication
+      # ==========================
+      webserver.security.enable=false
+      webserver.auth.credentials.file={{ cruise_control_install_path }}/config/realm.properties
+    insertafter: EOF
+
+- name: Customize program logging configuration
+  replace:
+    path: "{{ cruise_control_install_path }}/config/log4j.properties"
+    regexp: "{{ item[0] }}"
+    replace: "{{ item[1] }}"
+  loop:
+    - ['property\.filename=.*', "property.filename={{ cruise_control_logging_path }}"]
 
 - name: Install service units
   template:
@@ -75,7 +112,7 @@
       ############################# Metrics Settings #############################
 
       metric.reporters=com.linkedin.kafka.cruisecontrol.metricsreporter.CruiseControlMetricsReporter
-      cruise.control.metrics.reporter.bootstrap.servers=localhost:9092
+
   when: kafka_install_path and kafka_user
 
 - name: Download UI archive
