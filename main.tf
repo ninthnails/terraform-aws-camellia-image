@@ -38,7 +38,7 @@ resource "aws_s3_bucket" "source" {
       }
     }
   }
-  tags = merge(var.tags, map("Name", local.bucket_name))
+  tags = merge(var.tags, {Name: local.bucket_name})
   versioning {
     enabled = true
   }
@@ -259,7 +259,7 @@ resource "aws_security_group" "codebuild-egress" {
     ipv6_cidr_blocks = ["::/0"]
     to_port = 0
   }
-  tags = merge(var.tags, map("Name", "${var.prefix}-kafka-codebuild"))
+  tags = merge(var.tags, {Name: "${var.prefix}-kafka-codebuild"})
 }
 
 data "archive_file" "sources" {
