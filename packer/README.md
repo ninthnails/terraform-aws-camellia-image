@@ -1,3 +1,27 @@
+## Running Packer Manually
+
+For easier and faster development, you can build a new AMI manually by running `packer`.
+There's two types of packer template you can use: default and private.
+
+### Packer Default Template
+
+Building a new AMI using the default VPC.
+```shell
+packer build -var region=us-east-2 -var associate_public_ip_address=true \
+  -var security_group_source_cidrs="$(curl -s ipecho.net/plain)/32" \
+  aws-default.json
+```
+
+### Packer Private Template
+
+Building a new AMI using the provided private VPC and subnet. You must have access to the subnet, 
+typically through a VPN connected to your VPC.
+```shell
+packer build -var region=us-east-2 -var associate_public_ip_address=true \
+  -var vpc_id=vpc-1234567890abcdefg -var subnet_id=subnet-1234567890abcdefg \
+  aws-default.json
+```
+
 ## Running Ansible Playbook on Docker Container
 
 The Docker image is only a more convenient and faster way for developing Ansible playbook.
