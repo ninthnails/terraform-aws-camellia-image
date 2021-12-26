@@ -48,7 +48,7 @@ $(terraform output packer_build_command)
 
 | Name      | Version |
 |-----------|---------|
-| terraform | >= 1.0  |
+| terraform | >= 1.1  |
 | archive   | >= 2.2  |
 | aws       | >= 3.70 |
 | null      | >= 3.1  |
