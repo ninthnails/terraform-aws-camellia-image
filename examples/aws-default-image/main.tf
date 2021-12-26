@@ -1,7 +1,3 @@
-//terraform {
-//  required_version = ">= 0.14"
-//}
-
 #################
 # Variables
 #################
@@ -18,12 +14,6 @@ variable "prefix" {
 #################
 provider "aws" {
   region = var.aws_region
-}
-
-provider "archive" {
-}
-
-provider "random" {
 }
 
 #################

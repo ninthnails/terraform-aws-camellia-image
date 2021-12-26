@@ -1,7 +1,3 @@
-terraform {
-  required_version = ">= 0.14"
-}
-
 #################
 # Variables
 #################
@@ -29,12 +25,6 @@ variable "private_subnet_ids" {
 #################
 provider "aws" {
   region = var.aws_region
-}
-
-provider "archive" {
-}
-
-provider "random" {
 }
 
 #################
