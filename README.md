@@ -23,7 +23,7 @@ module "camellia-image" {
   version = "1.5.2"
   prefix = "camellia"
   packer_template = "aws-private.json"
-  packer_instance_type = "t3a.micro"
+  packer_instance_type = "t3a.medium"
   vpc_id = "vpc-54e70a3249a84d75f"
   subnet_ids = ["subnet-eb537de7850039a7f"]
   tags = {
@@ -46,10 +46,10 @@ $(terraform output packer_build_command)
 
 ## Requirements
 
-| Name | Version |
-|------|---------|
-| terraform | >= 0.13 |
-| archive | >= 2.2 |
-| aws | >= 2.70 |
-| null | >= 3.1 |
-| random | >= 2.1 |
+| Name      | Version |
+|-----------|---------|
+| terraform | >= 0.14 |
+| archive   | >= 2.2  |
+| aws       | >= 3.70 |
+| null      | >= 3.1  |
+| random    | >= 3.1  |
