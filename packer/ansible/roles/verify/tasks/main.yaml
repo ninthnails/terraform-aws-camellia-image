@@ -196,7 +196,7 @@
         state: absent
       loop:
         - "{{ kafka_install_path }}/config/server.properties.back"
-        - "{{ cruise_control_install_path }}/config/cruisecontrol.properties"
+        - "{{ cruise_control_install_path }}/config/cruisecontrol.properties.back"
 
 - name: Get service status
   service_facts:

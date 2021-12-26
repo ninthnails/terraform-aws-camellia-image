@@ -22,7 +22,7 @@ setup_cruise_control() {
   local storepass
 
 #  storepass=$(< /dev/urandom tr -dc '_A-Za-z0-9@%*~,.?' | head -c16)
-  storepass=$(/bin/date | /bin/sha256sum | /bin/base64 | /bin/head -c 16)
+  storepass=$(/bin/date | /bin/sha256sum | /bin/base64 | /bin/head -c 24)
 
   /bin/keytool -genkeypair -alias localhost -keyalg RSA -keysize 2048 -storetype PKCS12 -storepass "${storepass}" \
     -dname "CN=$(/usr/bin/hostname)" -validity 732 -keystore "{{ cruise_control_install_path }}/config/default.p12"
