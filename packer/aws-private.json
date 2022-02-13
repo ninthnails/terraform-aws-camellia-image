@@ -24,8 +24,8 @@
           "virtualization-type": "hvm",
           "architecture": "x86_64",
           "ena-support": "true",
-          "name": "amzn2-ami-hvm-2.0.2021*",
-          "description": "Amazon Linux 2 AMI 2.0.2021* x86_64 HVM gp2",
+          "name": "amzn2-ami-kernel-*-hvm-2.0.2022*-x86_64-gp2",
+          "description": "Amazon Linux 2 Kernel * AMI 2.0.2022* x86_64 HVM gp2",
           "root-device-type": "ebs",
           "block-device-mapping.volume-type": "gp2"
         },

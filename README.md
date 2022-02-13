@@ -4,10 +4,10 @@ Terraform module which creates Amazon Machine Images (AMI) for Camellia using Ha
 
 ## Available Features
 * Apache Kafka version 2.5.1
-* Based on Amazon Linux 2 with performance tuning 
+* Based on Amazon Linux 2.0 2022 with performance tuning
 * Multi Availability Zone support
 * Support EBS, Instance Storage and root volume as storage types  
-* Support `gp2`, `io1`, `st1` and `ephemeral` storage volume types
+* Support `gp3`, `gp2`, `io1`, `st1` and `ephemeral` storage volume types
 * XFS filesystem tune for better performance
 * Swap file setup 
 * Support multiple type and number of volumes
