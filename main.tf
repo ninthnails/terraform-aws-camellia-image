@@ -6,7 +6,7 @@ data "aws_region" "current" {}
 data "aws_caller_identity" "current" {}
 
 data "aws_vpc" "this" {
-  id = local.is_vpc_provided ? var.vpc_id : null
+  id      = local.is_vpc_provided ? var.vpc_id : null
   default = local.is_vpc_provided ? false : true
 }
 
@@ -29,7 +29,7 @@ resource "random_id" "s3" {
 }
 
 resource "aws_s3_bucket" "source" {
-  acl = "private"
+  acl    = "private"
   bucket = local.bucket_name
   server_side_encryption_configuration {
     rule {
@@ -38,7 +38,7 @@ resource "aws_s3_bucket" "source" {
       }
     }
   }
-  tags = merge(var.tags, {Name: local.bucket_name})
+  tags = merge(var.tags, { Name : local.bucket_name })
   versioning {
     enabled = true
   }
@@ -60,128 +60,120 @@ data "aws_iam_policy_document" "service-assume" {
 }
 
 resource "aws_iam_role" "service" {
-  name = "${var.prefix}-kafka-codebuild"
-  tags = var.tags
+  name               = "${var.prefix}-kafka-codebuild"
+  tags               = var.tags
   assume_role_policy = data.aws_iam_policy_document.service-assume.json
 }
 
-resource "aws_iam_role_policy" "codebuild" {
-  name = "codebuild"
-  role = aws_iam_role.service.id
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": [
-        "logs:*",
-        "ec2:CreateNetworkInterface",
-        "ec2:DescribeNetworkInterfaces",
-        "ec2:DeleteNetworkInterface",
-        "ec2:DescribeSubnets",
-        "ec2:DescribeSecurityGroups",
-        "ec2:DescribeDhcpOptions",
-        "ec2:DescribeVpcs",
-        "ec2:CreateNetworkInterfacePermission"
-      ],
-      "Effect": "Allow",
-      "Resource": "*"
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "s3:GetObject",
-        "s3:GetObjectVersion",
-        "s3:PutObject"
-      ],
-      "Resource": [
-        "arn:aws:s3:::${local.bucket_name}",
-        "arn:aws:s3:::${local.bucket_name}/*"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Resource": [
-        "arn:aws:s3:::${local.bucket_name}"
-      ],
-      "Action": [
-        "s3:ListBucket",
-        "s3:GetBucketAcl",
-        "s3:GetBucketLocation"
-      ]
-    },
-    {
-      "Effect": "Allow",
-      "Action": [
-        "ec2:AttachVolume",
-        "ec2:AuthorizeSecurityGroupIngress",
-        "ec2:CopyImage",
-        "ec2:CreateImage",
-        "ec2:CreateKeypair",
-        "ec2:CreateSecurityGroup",
-        "ec2:CreateSnapshot",
-        "ec2:CreateTags",
-        "ec2:CreateVolume",
-        "ec2:DeleteKeyPair",
-        "ec2:DeleteSecurityGroup",
-        "ec2:DeleteSnapshot",
-        "ec2:DeleteVolume",
-        "ec2:DeregisterImage",
-        "ec2:DescribeImageAttribute",
-        "ec2:DescribeImages",
-        "ec2:DescribeInstances",
-        "ec2:DescribeRegions",
-        "ec2:DescribeSecurityGroups",
-        "ec2:DescribeSnapshots",
-        "ec2:DescribeSubnets",
-        "ec2:DescribeTags",
-        "ec2:DescribeVolumes",
-        "ec2:DetachVolume",
-        "ec2:GetPasswordData",
-        "ec2:ModifyImageAttribute",
-        "ec2:ModifyInstanceAttribute",
-        "ec2:ModifySnapshotAttribute",
-        "ec2:RegisterImage",
-        "ec2:RunInstances",
-        "ec2:StopInstances",
-        "ec2:TerminateInstances",
-        "sts:DecodeAuthorizationMessage"
-      ],
-      "Resource": "*"
-    },
-    {
-      "Sid": "PackerIAM",
-      "Effect": "Allow",
-      "Action": [
-        "iam:PassRole",
-        "iam:GetInstanceProfile"
-      ],
-      "Resource": [
-        "*"
-      ]
-    }
-  ]
+data "aws_iam_policy_document" "codebuild" {
+  statement {
+    actions = [
+      "logs:*",
+      "ec2:CreateNetworkInterface",
+      "ec2:DescribeNetworkInterfaces",
+      "ec2:DeleteNetworkInterface",
+      "ec2:DescribeSubnets",
+      "ec2:DescribeSecurityGroups",
+      "ec2:DescribeDhcpOptions",
+      "ec2:DescribeVpcs",
+      "ec2:CreateNetworkInterfacePermission"
+    ]
+    effect    = "Allow"
+    resources = ["*"]
+  }
+  statement {
+    actions = [
+      "s3:GetObject",
+      "s3:GetObjectVersion",
+      "s3:PutObject"
+    ]
+    effect = "Allow"
+    resources = [
+      "arn:aws:s3:::${local.bucket_name}",
+      "arn:aws:s3:::${local.bucket_name}/*"
+    ]
+  }
+  statement {
+    actions = [
+      "s3:ListBucket",
+      "s3:GetBucketAcl",
+      "s3:GetBucketLocation"
+    ]
+    effect = "Allow"
+    resources = [
+      "arn:aws:s3:::${local.bucket_name}"
+    ]
+  }
+  statement {
+    actions = [
+      "ec2:AttachVolume",
+      "ec2:AuthorizeSecurityGroupIngress",
+      "ec2:CopyImage",
+      "ec2:CreateImage",
+      "ec2:CreateKeypair",
+      "ec2:CreateSecurityGroup",
+      "ec2:CreateSnapshot",
+      "ec2:CreateTags",
+      "ec2:CreateVolume",
+      "ec2:DeleteKeyPair",
+      "ec2:DeleteSecurityGroup",
+      "ec2:DeleteSnapshot",
+      "ec2:DeleteVolume",
+      "ec2:DeregisterImage",
+      "ec2:DescribeImageAttribute",
+      "ec2:DescribeImages",
+      "ec2:DescribeInstances",
+      "ec2:DescribeRegions",
+      "ec2:DescribeSecurityGroups",
+      "ec2:DescribeSnapshots",
+      "ec2:DescribeSubnets",
+      "ec2:DescribeTags",
+      "ec2:DescribeVolumes",
+      "ec2:DetachVolume",
+      "ec2:GetPasswordData",
+      "ec2:ModifyImageAttribute",
+      "ec2:ModifyInstanceAttribute",
+      "ec2:ModifySnapshotAttribute",
+      "ec2:RegisterImage",
+      "ec2:RunInstances",
+      "ec2:StopInstances",
+      "ec2:TerminateInstances",
+      "sts:DecodeAuthorizationMessage"
+    ]
+    effect    = "Allow"
+    resources = ["*"]
+  }
+  statement {
+    actions = [
+      "iam:PassRole",
+      "iam:GetInstanceProfile"
+    ]
+    effect    = "Allow"
+    resources = ["*"]
+  }
 }
-  EOF
+
+resource "aws_iam_role_policy" "codebuild" {
+  name   = "codebuild"
+  role   = aws_iam_role.service.id
+  policy = data.aws_iam_policy_document.codebuild.json
+}
+
+data "aws_iam_policy_document" "packer-assume" {
+  statement {
+    actions = ["sts:AssumeRole"]
+    effect  = "Allow"
+    principals {
+      identifiers = ["ec2.amazonaws.com"]
+      type        = "Service"
+    }
+  }
 }
 
 resource "aws_iam_role" "packer" {
-  name = "${var.prefix}-packer-instance-role"
-  tags = var.tags
-  assume_role_policy = <<EOF
-{
- "Version": "2012-10-17",
- "Statement": [
-   {
-     "Action": "sts:AssumeRole",
-     "Principal": {
-       "Service": "ec2.amazonaws.com"
-     },
-     "Effect": "Allow"
-   }
- ]
-}
-  EOF
+  name               = "${var.prefix}-packer-instance-role"
+  tags               = var.tags
+  assume_role_policy = data.aws_iam_policy_document.packer-assume.json
 }
 
 resource "aws_iam_instance_profile" "packer" {
@@ -189,92 +181,91 @@ resource "aws_iam_instance_profile" "packer" {
   role = aws_iam_role.packer.name
 }
 
-resource "aws_iam_role_policy" "packer" {
-  name = "ec2"
-  role = aws_iam_role.packer.id
-  policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [{
-      "Effect": "Allow",
-      "Action" : [
-        "ec2:AttachVolume",
-        "ec2:AuthorizeSecurityGroupIngress",
-        "ec2:CopyImage",
-        "ec2:CreateImage",
-        "ec2:CreateKeypair",
-        "ec2:CreateSecurityGroup",
-        "ec2:CreateSnapshot",
-        "ec2:CreateTags",
-        "ec2:CreateVolume",
-        "ec2:DeleteKeyPair",
-        "ec2:DeleteSecurityGroup",
-        "ec2:DeleteSnapshot",
-        "ec2:DeleteVolume",
-        "ec2:DeregisterImage",
-        "ec2:DescribeImageAttribute",
-        "ec2:DescribeImages",
-        "ec2:DescribeInstances",
-        "ec2:DescribeInstanceStatus",
-        "ec2:DescribeRegions",
-        "ec2:DescribeSecurityGroups",
-        "ec2:DescribeSnapshots",
-        "ec2:DescribeSubnets",
-        "ec2:DescribeTags",
-        "ec2:DescribeVolumes",
-        "ec2:DetachVolume",
-        "ec2:GetPasswordData",
-        "ec2:ModifyImageAttribute",
-        "ec2:ModifyInstanceAttribute",
-        "ec2:ModifySnapshotAttribute",
-        "ec2:RegisterImage",
-        "ec2:RunInstances",
-        "ec2:StopInstances",
-        "ec2:TerminateInstances",
-        "ec2:CreateLaunchTemplate",
-        "ec2:DeleteLaunchTemplate",
-        "ec2:CreateFleet",
-        "ec2:DescribeSpotPriceHistory"
-      ],
-      "Resource" : "*"
-  }]
+data "aws_iam_policy_document" "packer" {
+  statement {
+    actions = [
+      "ec2:AttachVolume",
+      "ec2:AuthorizeSecurityGroupIngress",
+      "ec2:CopyImage",
+      "ec2:CreateImage",
+      "ec2:CreateKeypair",
+      "ec2:CreateSecurityGroup",
+      "ec2:CreateSnapshot",
+      "ec2:CreateTags",
+      "ec2:CreateVolume",
+      "ec2:DeleteKeyPair",
+      "ec2:DeleteSecurityGroup",
+      "ec2:DeleteSnapshot",
+      "ec2:DeleteVolume",
+      "ec2:DeregisterImage",
+      "ec2:DescribeImageAttribute",
+      "ec2:DescribeImages",
+      "ec2:DescribeInstances",
+      "ec2:DescribeInstanceStatus",
+      "ec2:DescribeRegions",
+      "ec2:DescribeSecurityGroups",
+      "ec2:DescribeSnapshots",
+      "ec2:DescribeSubnets",
+      "ec2:DescribeTags",
+      "ec2:DescribeVolumes",
+      "ec2:DetachVolume",
+      "ec2:GetPasswordData",
+      "ec2:ModifyImageAttribute",
+      "ec2:ModifyInstanceAttribute",
+      "ec2:ModifySnapshotAttribute",
+      "ec2:RegisterImage",
+      "ec2:RunInstances",
+      "ec2:StopInstances",
+      "ec2:TerminateInstances",
+      "ec2:CreateLaunchTemplate",
+      "ec2:DeleteLaunchTemplate",
+      "ec2:CreateFleet",
+      "ec2:DescribeSpotPriceHistory"
+    ]
+    effect    = "Allow"
+    resources = ["*"]
+  }
 }
-  EOF
+
+resource "aws_iam_role_policy" "packer" {
+  name   = "ec2"
+  role   = aws_iam_role.packer.id
+  policy = data.aws_iam_policy_document.packer.json
 }
 
 resource "aws_cloudwatch_log_group" "packer" {
-  name = "/aws/codebuild/${var.prefix}-kafka-automation-packer"
+  name              = "/aws/codebuild/${var.prefix}-kafka-automation-packer"
   retention_in_days = 7
 }
 
 resource "aws_security_group" "codebuild-egress" {
-  count = local.is_vpc_provided ? 1 : 0
+  count       = local.is_vpc_provided ? 1 : 0
   name_prefix = "${var.prefix}-kafka-codebuild-"
   description = "Group that CodeBuild uses to allow access to resources in the VPC and the Internet."
-  vpc_id = var.vpc_id
+  vpc_id      = var.vpc_id
   egress {
-    from_port = 0
-    protocol = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    from_port        = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
     ipv6_cidr_blocks = ["::/0"]
-    to_port = 0
+    to_port          = 0
   }
-  tags = merge(var.tags, {Name: "${var.prefix}-kafka-codebuild"})
+  tags = merge(var.tags, { Name : "${var.prefix}-kafka-codebuild" })
 }
 
 data "archive_file" "sources" {
-  type = "zip"
+  type        = "zip"
   output_path = "${path.module}/sources.zip"
-  source_dir = "${path.module}/packer"
+  source_dir  = "${path.module}/packer"
 }
 
 resource "aws_s3_bucket_object" "sources" {
-  acl = "private"
-  key = "codebuild/${var.prefix}-kafka-packer-sources.zip"
-  bucket = aws_s3_bucket.source.bucket
-  source = data.archive_file.sources.output_path
+  acl           = "private"
+  key           = "codebuild/${var.prefix}-kafka-packer-sources.zip"
+  bucket        = aws_s3_bucket.source.bucket
+  source        = data.archive_file.sources.output_path
   storage_class = "STANDARD_IA"
-  etag = data.archive_file.sources.output_md5
+  etag          = data.archive_file.sources.output_md5
 }
 
 // Introduce wait time to work around race condition between CodeBuild project and IAM service role creations.
@@ -291,7 +282,7 @@ resource "null_resource" "delay" {
 resource "aws_codebuild_project" "packer" {
   name = "${var.prefix}-kafka-automation-packer"
   // The resource id isn't important, it's there to force dependency on the resource.
-  description = "Runs Packer to build AMI${substr(null_resource.delay.id, 0, 0)}"
+  description  = "Runs Packer to build AMI${substr(null_resource.delay.id, 0, 0)}"
   service_role = aws_iam_role.service.arn
 
   logs_config {
@@ -306,8 +297,8 @@ resource "aws_codebuild_project" "packer" {
 
   environment {
     compute_type = "BUILD_GENERAL1_SMALL"
-    image = "aws/codebuild/amazonlinux2-x86_64-standard:3.0"
-    type = "LINUX_CONTAINER"
+    image        = "aws/codebuild/amazonlinux2-x86_64-standard:3.0"
+    type         = "LINUX_CONTAINER"
   }
 
   source {
@@ -350,8 +341,8 @@ phases:
         -var build_number=$${CODEBUILD_BUILD_NUMBER-UNKNOWN}
         ${var.packer_template}
 EOF
-    type = "S3"
-    location = "${aws_s3_bucket_object.sources.bucket}/${aws_s3_bucket_object.sources.key}"
+    type      = "S3"
+    location  = "${aws_s3_bucket_object.sources.bucket}/${aws_s3_bucket_object.sources.key}"
   }
 
   tags = var.tags
@@ -360,8 +351,8 @@ EOF
     for_each = local.is_vpc_provided ? map(var.vpc_id, var.subnet_ids) : {}
     content {
       security_group_ids = [aws_security_group.codebuild-egress[0].id]
-      subnets = vpc_config.value
-      vpc_id = vpc_config.key
+      subnets            = vpc_config.value
+      vpc_id             = vpc_config.key
     }
   }
 }
